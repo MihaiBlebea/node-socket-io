@@ -3,6 +3,7 @@ const http = require('http');
 const path = require('path');
 const moment = require('moment');
 const socketIO = require('socket.io');
+const port = process.env.PORT || 3000;
 
 const connect = require('./connect.js');
 const store = require('./store.js');
@@ -96,6 +97,6 @@ app.get('/store/user', function(request, response) {
 
 
 // Set up port to listen
-server.listen(3000, function() {
-    console.log('Started app on port 3000');
+server.listen(port, function() {
+    console.log('Started app on port', port);
 });
