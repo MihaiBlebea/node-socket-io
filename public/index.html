@@ -1,0 +1,45 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+        <h1>Welcome to the Chat app</h1>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+        function get()
+        {
+            var d = new Date();
+            var year = d.getFullYear();
+            var month = d.getMonth();
+            var day = d.getDate();
+            var hour = d.getHours();
+            var minute = d.getMinutes();
+            var second = d.getSeconds();
+
+            return day + '-' + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
+        }
+        </script>
+        <script>
+            var socket = io();
+
+            socket.on('connect', function() {
+                console.log('Connected to server');
+
+                socket.emit('createMessage', {
+                    from: 'Browser',
+                    to: 'Server',
+                    text: 'Hey server! What\'s up?',
+                    createdAt: get()
+                });
+            });
+
+            socket.on('disconnect', function() {
+                console.log('Disconected from server');
+            });
+
+            socket.on('newMessage', function(message) {
+                console.log('New message from Server', JSON.stringify(message, undefined, 2));
+            });
+        </script>
+    </body>
+</html>

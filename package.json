@@ -1,0 +1,17 @@
+{
+  "name": "node-project-firebase",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2",
+    "firebase": "^4.6.0",
+    "moment": "^2.19.1",
+    "socket.io": "^2.0.4"
+  }
+}
