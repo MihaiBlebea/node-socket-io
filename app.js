@@ -24,17 +24,24 @@ app.use('*', express.static(publicPath));
 io.on('connection', function(socket) {
     console.log('New user connected');
 
-    // Send new message to the browser
-    socket.emit('newMessage', {
-        from: 'Server',
-        to: 'Browser',
-        text: 'Hey browser! How are you?',
-        createdAt: time.get()
+    socket.on('createMessage', function(message) {
+        console.log('Message received', JSON.stringify(message, undefined, 2));
+        io.emit('newMessage', {
+            from: message.from,
+            to: message.to,
+            text: message.text,
+            createdAt: time.get()
+        });
     });
 
-    socket.on('createMessage', function(message) {
-        console.log('MEssage received', JSON.stringify(message, undefined, 2));
-    });
+    socket.on('type', function(type) {
+        console.log(type.user, ' is typeing');
+        io.emit('newType', {
+            user: type.user,
+            type: true,
+            createdAt: time.get()
+        });
+    })
 
     // Client was disconnected from the server
     socket.on('disconnect', function() {
