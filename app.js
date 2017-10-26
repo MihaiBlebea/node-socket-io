@@ -18,7 +18,7 @@ var server = http.createServer(app);
 var io = socketIO(server);
 
 // Set up middleware
-app.use('*', express.static(publicPath));
+app.use('/', express.static(publicPath));
 
 
 // Socket events
