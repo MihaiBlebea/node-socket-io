@@ -171,9 +171,9 @@
                 {
                     if(talks[i].from == setAvatar())
                     {
-                        out += `<div class="bubbly speech-bubble-me">${talks[i].createdAt.split(' ')[1]}: ${talks[i].text}</div>`;
+                        out += `<div class="bubbly ${(i == talks.length - 1)? 'animated fadeIn' : ''} speech-bubble-me">${talks[i].createdAt.split(' ')[1]}: ${talks[i].text}</div>`;
                     } else {
-                        out += `<div class="bubbly speech-bubble-you">${talks[i].createdAt.split(' ')[1]}: ${talks[i].text}</div>`;
+                        out += `<div class="bubbly ${(i == talks.length - 1)? 'animated fadeIn' : ''} speech-bubble-you">${talks[i].createdAt.split(' ')[1]}: ${talks[i].text}</div>`;
                     }
                 }
                 out += '<a id="final"></a>';
