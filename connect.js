@@ -8,8 +8,6 @@ var app = firebase.initializeApp({
 });
 
 var database = firebase.database();
-var ref = database.ref('users');
+// var ref = database.ref('users');
 
-module.exports = {
-    ref
-}
+module.exports = database;

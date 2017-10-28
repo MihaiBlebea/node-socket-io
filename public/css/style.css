@@ -1,0 +1,51 @@
+body {
+    background-color:lightgrey;
+}
+.messenger-container {
+    width: 500px;
+    height:80%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+textarea {
+    resize: none;
+}
+#isType {
+    margin-top:10px;
+    visibility: hidden;
+    transition: all 0.5s ease-in-out;
+    text-align:center;
+}
+.talks-container {
+    height:380px;
+    overflow: auto;
+    padding: 10px 20px;
+}
+.bubbly {
+    margin-bottom:5px;
+}
+.avatar-head {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    top: 15px;
+    left: -80px;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: 5px 5px 2px grey;
+    background-image: url('https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png');
+    background-size: cover;
+    border: 5px solid white;
+}
+#avatar {
+    top: 100px;
+    position: absolute;
+    max-width: 80px;
+    font-weight: bolder;
+    background-color: rgba(1, 105, 217, 0.76);
+    color: white;
+}

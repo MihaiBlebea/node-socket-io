@@ -4,238 +4,88 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
-        <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css"> -->
-        <link rel="stylesheet" href="css/speech-bubble.css">
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="css/animate.css">
         <link rel="stylesheet" href="css/bubbly.css">
-        <style>
-            body {
-                background-color:lightgrey;
-            }
-            .messenger-container {
-                width: 500px;
-                height:80%;
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                margin: auto;
-            }
-            textarea {
-                resize: none;
-            }
-            #isType {
-                margin-top:10px;
-                visibility: hidden;
-                transition: all 0.5s ease-in-out;
-                text-align:center;
-            }
-            .talks-container {
-                height:300px;
-                overflow: auto;
-                padding: 10px 20px;
-            }
-            .bubbly {
-                margin-bottom:5px;
-            }
-        </style>
     </head>
     <body>
 
         <div class="card messenger-container animated fadeInDown">
             <div class="card-body">
                 <h3 class="text-center">Welcome to the Chat app</h3>
-                <div class="form-group">
-                    <label for="exampleInputEmail1">My name is:</label>
-                    <input onkeyup="setAvatar();" type="text" class="form-control" id="avatar" aria-describedby="emailHelp" placeholder="Let everybody know...">
-                </div>
-                <!-- <div class="form-group">
-                    <label for="exampleFormControlTextarea1">Example textarea</label>
-                    <textarea readonly rows="10" class="form-control" id="talk-show" rows="3"></textarea>
-                </div> -->
-                <div class="talks-container">
-                    <div id="talks"></div>
+                <div id="menu" class="mt-4">
+                    <ul class="nav nav-tabs mb-3">
+                        <li class="nav-item">
+                            <a id="tab-register" class="nav-link active" href="#">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="tab-login" class="nav-link" href="#">Login</a>
+                        </li>
+                    </ul>
                 </div>
 
+                <div id="register">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input id="username" type="text" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Email address</label>
+                        <input id="email" type="email" class="form-control"/>
+                    </div>
+                    <div class="text-center">
+                        <button id="button-register" class="btn btn-primary">Register</button>
+                    </div>
+                </div>
 
-                <div class="input-group">
-                    <input id="user-message" onkeyup="sendType();" onkeypress="handle(event)" type="text" class="form-control" placeholder="Type here..." aria-label="Search for...">
-                    <span class="input-group-btn">
-                        <button id="send-button" onclick="send()" class="btn btn-primary" type="button">Send!</button>
-                    </span>
+                <div id="login" style="display:none;">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input id="login-username" type="text" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Email address</label>
+                        <input id="login-email" type="email" class="form-control"/>
+                    </div>
+                    <div class="text-center">
+                        <button id="button-login" class="btn btn-primary">Login</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <p style="visibility:hidden" id="isType"></p>
-                </div>
-                <div id="error" style="display:none;" class="alert alert-danger animated fadeInDown" role="alert">
-                    This is a danger alert—check it out!
-                </div>
-                <div id="success" style="display:none;" class="alert alert-success" role="alert">
-                    This is a danger alert—check it out!
+
+                <div id="chat" style="display:none;">
+                    <div class="talks-container">
+                        <div id="talks"></div>
+                    </div>
+
+                    <div id="avatar-head" style="display:none;" class="avatar-head animated zoomIn"><span id="avatar"></span></div>
+
+                    <div class="input-group">
+                        <input id="user-message" type="text" class="form-control" placeholder="Type here...">
+                        <span class="input-group-btn">
+                            <button id="send-button" class="btn btn-primary" type="button">Send!</button>
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <p style="visibility:hidden" id="isType"></p>
+                    </div>
+                    <div id="error" style="display:none;" class="alert alert-danger animated fadeInDown" role="alert">
+                        This is a danger alert—check it out!
+                    </div>
+                    <div id="success" style="display:none;" class="alert alert-success" role="alert">
+                        This is a danger alert—check it out!
+                    </div>
                 </div>
 
             </div>
         </div>
 
 
-        <script src="/socket.io/socket.io.js"></script>
         <script>
-        function handle(e)
-        {
-            if(e.keyCode === 13)
-            {
-                e.preventDefault(); // Ensure it is only this code that rusn
-                send();
-            }
-        }
+            setTimeout(function() {
+                document.getElementById('avatar-head').style.display = 'block';
+            }, 1000);
         </script>
-        <script>
-        function get()
-        {
-            var d = new Date();
-            var year = d.getFullYear();
-            var month = d.getMonth();
-            var day = d.getDate();
-            var hour = d.getHours();
-            var minute = d.getMinutes();
-            var second = d.getSeconds();
-
-            return day + '-' + month + '-' + year + ' ' + hour + ':' + minute + ':' + second;
-        }
-        </script>
-        <script>
-            // Set socket
-            var socket = io();
-            var talks = [];
-
-            // Get the avatar name from local storage
-            getAvatar();
-
-            function setAvatar()
-            {
-                var avatar = document.getElementById('avatar').value;
-                localStorage.setItem('avatar', avatar);
-                return localStorage.getItem('avatar');
-            }
-
-            function getAvatar()
-            {
-                var avatar = localStorage.getItem('avatar');
-                document.getElementById('avatar').value = avatar;
-                return avatar;
-            }
-
-            function send()
-            {
-                // Check if the avatar name is set
-                var avatar = document.getElementById('avatar').value;
-                var mess = document.getElementById('user-message').value;
-
-                if(avatar !== "")
-                {
-                    if(mess !== "")
-                    {
-                        socket.emit('createMessage', {
-                            from: setAvatar(),
-                            to: 'all',
-                            text: mess,
-                            createdAt: get()
-                        });
-                        document.getElementById('user-message').value = '';
-                    }
-                } else {
-                    triggerError('Please select an alias name first', 'error');
-                }
-            }
-
-            function receive(data)
-            {
-
-                // var talk = document.getElementById('talk-show');
-
-                // var old = talk.value;
-                // talk.value = old + (old == '' ? '' : '\n') + '[' + data.createdAt.split(' ')[1] + '] ' + '[' + data.from + ']: ' + data.text;
-                // console.log(talk);
-
-                // Create new system
-                talks.push(data);
-                displayTalks();
-                console.log(talks);
-            }
-
-            function displayTalks()
-            {
-                var out = '';
-                for(var i = 0; i < talks.length; i++)
-                {
-                    if(talks[i].from == setAvatar())
-                    {
-                        out += `<div class="bubbly ${(i == talks.length - 1)? 'animated fadeIn' : ''} speech-bubble-me">${talks[i].createdAt.split(' ')[1]}: ${talks[i].text}</div>`;
-                    } else {
-                        out += `<div class="bubbly ${(i == talks.length - 1)? 'animated fadeIn' : ''} speech-bubble-you">${talks[i].createdAt.split(' ')[1]}: ${talks[i].text}</div>`;
-                    }
-                }
-                out += '<a id="final"></a>';
-                document.getElementById('talks').innerHTML = out;
-                window.location.href = "#final";
-            }
-
-            function sendType()
-            {
-                socket.emit('type', {
-                    user: setAvatar(),
-                    type: true,
-                    createdAt: get()
-                });
-            }
-
-            function displayType(type)
-            {
-                if(type.user !== setAvatar())
-                {
-                    var display = document.getElementById('isType');
-                    display.innerHTML = type.user + ' is typing';
-                    display.style.visibility = 'visible';
-                    setTimeout(function() {
-                        display.innerHTML = '';
-                        display.style.visibility = 'hidden';
-                    }, 2000);
-                }
-            }
-
-            function triggerError(message, type)
-            {
-                if(type == 'error')
-                {
-                    document.getElementById('error').innerHTML = message;
-                    document.getElementById('error').style.display = 'block';
-                    document.getElementById('avatar').classList.add('is-invalid', 'animated', 'tada');
-                }
-
-                setTimeout(function() {
-                    document.getElementById('avatar').classList.remove('is-invalid', 'animated', 'tada');
-                    document.getElementById('error').style.display = 'none';
-                }, 5000);
-
-            }
-
-
-            socket.on('disconnect', function() {
-                console.log('Disconected from server');
-            });
-
-            // Receive message from server
-            socket.on('newMessage', function(message) {
-                console.log('New message from Server', JSON.stringify(message, undefined, 2));
-                receive(message);
-            });
-
-            // If true means somebody is typeing
-            socket.on('newType', function(type) {
-                console.log(type.user, ' started typing');
-                displayType(type);
-            });
-        </script>
+        <script src="/js/bundle.js"></script>
     </body>
 </html>

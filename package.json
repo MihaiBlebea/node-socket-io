@@ -5,11 +5,14 @@
   "main": "app.js",
   "scripts": {
     "test": "test",
-    "start": "node app.js"
+    "start": "node run.js",
+    "start-watch": "nodemon run.js",
+    "build-js": "watchify public/js/run.js -o public/js/bundle.js -v"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "firebase": "^4.6.0",
     "moment": "^2.19.1",
