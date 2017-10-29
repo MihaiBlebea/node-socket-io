@@ -5,19 +5,21 @@ const avatar = require('./avatar.js');
 const message = require('./messages');
 const router = require('./clientRouter.js');
 const auth = require('./auth.js');
+const background = require('./background.js');
+
 
 var talks = [];
 var focusInterval;
 
-// (auth.getFromSession == true) ? router.goChat() : router.goLogin();
+// Init the background
+background.setBackground();
+
+// Check if the user is logged in
 (auth.getFromSession() == 'true') ? router.goChat() : router.goLogin();
 
 event.setFocus();
 avatar.getAvatar();
 
-// window.document.addEventListener('load', function() {
-//     (auth.getFromSession() == true) ? router.goChat() : router.goLogin();
-// });
 
 var register = document.getElementById('button-register');
 register.addEventListener('click', auth.registerUser);
@@ -42,23 +44,13 @@ messageInput.addEventListener('keypress', event.handle);
 var sendButton = document.getElementById('send-button');
 sendButton.addEventListener('click', message.send);
 
-// Get the avatar name from local storage
-// avatar.getAvatar();
 
-function triggerError(message, type)
-{
-    if(type == 'error')
-    {
-        document.getElementById('error').innerHTML = message;
-        document.getElementById('error').style.display = 'block';
-        document.getElementById('avatar').classList.add('is-invalid', 'animated', 'tada');
-    }
+var logout = document.getElementById('logout');
+logout.addEventListener('click', function() {
+    router.goLogin();
+    auth.storeInSession(false);
+});
 
-    setTimeout(function() {
-        document.getElementById('avatar').classList.remove('is-invalid', 'animated', 'tada');
-        document.getElementById('error').style.display = 'none';
-    }, 5000);
-}
 
 socket.on('disconnect', function() {
     console.log('Disconected from server');

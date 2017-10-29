@@ -26,24 +26,42 @@ app.get('/get/:name', function(request, response) {
 
 // Store a new user
 app.post('/store/user', function(request, response) {
-    var doc = {
-        username: request.body.username,
-        email: request.body.email
-    };
-    connect.ref('users').push(doc).then((result)=> {
-        console.log('Entry saved: ', JSON.stringify(doc, undefined, 2));
-        response.json(doc);
-    }).catch((err)=> {
-        console.log(doc);
+    connect.ref('users').once('value', function(result) {
+        var data = result.val();
+        var keys = Object.keys(data);
+        var exist = keys.indexOf(request.body.username);
+        if(exist == -1)
+        {
+            connect.ref(`users/${request.body.username}`).set({
+                email: request.body.email
+            }).then((result)=> {
+                // console.log(result);
+                response.json(true);
+            }).catch((err)=> {
+                console.log(err);
+            });
+        } else {
+            console.log('username already exists');
+            response.json(false);
+        }
     });
 });
 
 app.post('/login', function(request, response) {
-    connect.ref('users').orderByChild('username').equalTo(request.body.username).on('child_added', function(snapshot) {
-        // console.log('email client', request.body.email);
-        // console.log('email server', snapshot.val().email);
-        response.send((request.body.email == snapshot.val().email) ? true : false);
-    });
+    connect.ref('users').once('value', function(result) {
+        var data = result.val();
+        if(data[request.body.username] !== undefined)
+        {
+            if(request.body.email == data[request.body.username]['email'])
+            {
+                response.json(true);
+            } else {
+                response.json(false);
+            }
+        } else {
+            response.json(false);
+        }
+    })
 });
 
 module.exports = app;

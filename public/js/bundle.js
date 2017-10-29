@@ -702,7 +702,7 @@ function localstorage() {
 }
 
 }).call(this,require('_process'))
-},{"./debug":10,"_process":48}],10:[function(require,module,exports){
+},{"./debug":10,"_process":50}],10:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -3070,7 +3070,7 @@ WS.prototype.check = function () {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../transport":13,"component-inherit":8,"debug":9,"engine.io-parser":20,"parseqs":28,"ws":47,"yeast":39}],19:[function(require,module,exports){
+},{"../transport":13,"component-inherit":8,"debug":9,"engine.io-parser":20,"parseqs":28,"ws":49,"yeast":39}],19:[function(require,module,exports){
 (function (global){
 // browser shim for xmlhttprequest module
 
@@ -6186,17 +6186,25 @@ module.exports = yeast;
 },{}],40:[function(require,module,exports){
 const router = require('./clientRouter.js');
 const avatar = require('./avatar.js');
+const error = require('./error.js');
 
 function registerUser()
 {
-    console.log('register function');
     var username = document.getElementById('username').value;
     var email = document.getElementById('email').value;
     axios.post('store/user', {
         username: username,
         email: email
     }).then((response)=> {
-
+        if(response.data == false)
+        {
+            console.log('show error', response.data);
+            error.trigger('register-error', 'Username is already in use. Please choose another one', 'danger');
+        } else {
+            console.log('go to login');
+            router.goLogin();
+            error.trigger('login-error', 'You have created a new account. Now it\'s time to login', 'success');
+        }
     }).catch((err)=> {
         console.log(err);
     });
@@ -6211,12 +6219,15 @@ function loginUser()
         username: username,
         email: email
     }).then((response)=> {
+        console.log(response.data);
         if(response.data == true)
         {
             avatar.setAvatar(username);
             avatar.getAvatar();
             router.goChat();
             storeInSession(true);
+        } else {
+            error.trigger('Invalid credentials', 'danger');
         }
     }).catch((err)=> {
         console.log(err);
@@ -6240,7 +6251,7 @@ module.exports = {
     getFromSession
 }
 
-},{"./avatar.js":41,"./clientRouter.js":42}],41:[function(require,module,exports){
+},{"./avatar.js":41,"./clientRouter.js":43,"./error.js":44}],41:[function(require,module,exports){
 function setAvatar(avatar)
 {
     // var avatar = document.getElementById('avatar').value;
@@ -6261,6 +6272,31 @@ module.exports = {
 }
 
 },{}],42:[function(require,module,exports){
+function setBackground()
+{
+    var bgs = [
+        'https://lh3.googleusercontent.com/3nIVpOWGLRDEJgbb8kzs_vaBzYlTy2HMFfoNG9xJYG3F5KaptMV7QUUpkgcL789aEXg=h900',
+        'https://businessfirstfamily.com/wp-content/uploads/2017/02/technology-background-build-app-1024x583.jpg',
+        'http://www.parkett-wohnwelt.de/gfx/items2013/hires/000/010/449/7877028.jpg',
+        'http://www.premierforkids.com/wp-content/uploads/2015/05/Jungle-Background-1024x440.jpg'
+    ];
+    var index = 0;
+
+    setInterval(function() {
+        index++;
+        if(index == bgs.length)
+        {
+            index = 0;
+        }
+        document.body.style.backgroundImage = `url(${bgs[index]})`;
+    }, 15000);
+}
+
+module.exports = {
+    setBackground
+}
+
+},{}],43:[function(require,module,exports){
 function goLogin()
 {
     // document.getElementById('login').classList.add('animated', 'zoomIn');
@@ -6301,7 +6337,26 @@ module.exports = {
     goChat
 }
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
+function triggerError(hook, message, type)
+{
+    var container = document.getElementById(hook);
+    var error = `<div class="alert alert-${type} animated fadeInDown" role="alert">
+                    ${message}
+                </div>`;
+
+    container.innerHTML = error;
+
+    setTimeout(function() {
+        container.innerHTML = '';
+    }, 5000);
+}
+
+module.exports = {
+    trigger: triggerError
+}
+
+},{}],45:[function(require,module,exports){
 const message = require('./messages');
 
 function handle(e)
@@ -6331,7 +6386,7 @@ module.exports = {
     loseFocus
 }
 
-},{"./messages":44}],44:[function(require,module,exports){
+},{"./messages":46}],46:[function(require,module,exports){
 const socket = require('socket.io-client')();
 const avatar = require('./avatar');
 const event = require('./events');
@@ -6413,7 +6468,7 @@ module.exports = {
     displayTyping
 }
 
-},{"./../../time.js":46,"./avatar":41,"./events":43,"socket.io-client":30}],45:[function(require,module,exports){
+},{"./../../time.js":48,"./avatar":41,"./events":45,"socket.io-client":30}],47:[function(require,module,exports){
 const socket = require('socket.io-client')();
 const event = require('./events.js');
 const time = require('./../../time.js');
@@ -6421,19 +6476,21 @@ const avatar = require('./avatar.js');
 const message = require('./messages');
 const router = require('./clientRouter.js');
 const auth = require('./auth.js');
+const background = require('./background.js');
+
 
 var talks = [];
 var focusInterval;
 
-// (auth.getFromSession == true) ? router.goChat() : router.goLogin();
+// Init the background
+background.setBackground();
+
+// Check if the user is logged in
 (auth.getFromSession() == 'true') ? router.goChat() : router.goLogin();
 
 event.setFocus();
 avatar.getAvatar();
 
-// window.document.addEventListener('load', function() {
-//     (auth.getFromSession() == true) ? router.goChat() : router.goLogin();
-// });
 
 var register = document.getElementById('button-register');
 register.addEventListener('click', auth.registerUser);
@@ -6458,23 +6515,13 @@ messageInput.addEventListener('keypress', event.handle);
 var sendButton = document.getElementById('send-button');
 sendButton.addEventListener('click', message.send);
 
-// Get the avatar name from local storage
-// avatar.getAvatar();
 
-function triggerError(message, type)
-{
-    if(type == 'error')
-    {
-        document.getElementById('error').innerHTML = message;
-        document.getElementById('error').style.display = 'block';
-        document.getElementById('avatar').classList.add('is-invalid', 'animated', 'tada');
-    }
+var logout = document.getElementById('logout');
+logout.addEventListener('click', function() {
+    router.goLogin();
+    auth.storeInSession(false);
+});
 
-    setTimeout(function() {
-        document.getElementById('avatar').classList.remove('is-invalid', 'animated', 'tada');
-        document.getElementById('error').style.display = 'none';
-    }, 5000);
-}
 
 socket.on('disconnect', function() {
     console.log('Disconected from server');
@@ -6492,7 +6539,7 @@ socket.on('newType', function(type) {
     message.displayTyping(type);
 });
 
-},{"./../../time.js":46,"./auth.js":40,"./avatar.js":41,"./clientRouter.js":42,"./events.js":43,"./messages":44,"socket.io-client":30}],46:[function(require,module,exports){
+},{"./../../time.js":48,"./auth.js":40,"./avatar.js":41,"./background.js":42,"./clientRouter.js":43,"./events.js":45,"./messages":46,"socket.io-client":30}],48:[function(require,module,exports){
 function get()
 {
     var d = new Date();
@@ -6510,9 +6557,9 @@ module.exports = {
     get
 }
 
-},{}],47:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 
-},{}],48:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -6698,4 +6745,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[45]);
+},{}]},{},[47]);

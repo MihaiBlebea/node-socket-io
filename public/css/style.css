@@ -1,5 +1,9 @@
 body {
     background-color:lightgrey;
+    background-image: url('https://lh3.googleusercontent.com/3nIVpOWGLRDEJgbb8kzs_vaBzYlTy2HMFfoNG9xJYG3F5KaptMV7QUUpkgcL789aEXg=h900');
+    background-position: top;
+    background-size:cover;
+    transition: all 0.5s ease-in-out;
 }
 .messenger-container {
     width: 500px;
@@ -48,4 +52,8 @@ textarea {
     font-weight: bolder;
     background-color: rgba(1, 105, 217, 0.76);
     color: white;
+}
+
+#logout:hover {
+    cursor:pointer;
 }

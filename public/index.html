@@ -34,9 +34,10 @@
                         <label>Email address</label>
                         <input id="email" type="email" class="form-control"/>
                     </div>
-                    <div class="text-center">
+                    <div class="text-center mb-4">
                         <button id="button-register" class="btn btn-primary">Register</button>
                     </div>
+                    <div id="register-error"></div>
                 </div>
 
                 <div id="login" style="display:none;">
@@ -48,9 +49,10 @@
                         <label>Email address</label>
                         <input id="login-email" type="email" class="form-control"/>
                     </div>
-                    <div class="text-center">
+                    <div class="text-center mb-4">
                         <button id="button-login" class="btn btn-primary">Login</button>
                     </div>
+                    <div id="login-error"></div>
                 </div>
 
                 <div id="chat" style="display:none;">
@@ -69,14 +71,11 @@
                     <div class="form-group">
                         <p style="visibility:hidden" id="isType"></p>
                     </div>
-                    <div id="error" style="display:none;" class="alert alert-danger animated fadeInDown" role="alert">
-                        This is a danger alert—check it out!
-                    </div>
-                    <div id="success" style="display:none;" class="alert alert-success" role="alert">
-                        This is a danger alert—check it out!
-                    </div>
-                </div>
+                    <button id="logout" type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
 
+                </div>
             </div>
         </div>
 
@@ -85,6 +84,11 @@
             setTimeout(function() {
                 document.getElementById('avatar-head').style.display = 'block';
             }, 1000);
+
+            // var logout = document.getElementById('logout');
+            // logout.addEventListener('click', function() {
+            //
+            // });
         </script>
         <script src="/js/bundle.js"></script>
     </body>
