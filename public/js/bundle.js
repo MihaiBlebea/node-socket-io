@@ -702,7 +702,7 @@ function localstorage() {
 }
 
 }).call(this,require('_process'))
-},{"./debug":10,"_process":50}],10:[function(require,module,exports){
+},{"./debug":10,"_process":51}],10:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -3070,7 +3070,7 @@ WS.prototype.check = function () {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../transport":13,"component-inherit":8,"debug":9,"engine.io-parser":20,"parseqs":28,"ws":49,"yeast":39}],19:[function(require,module,exports){
+},{"../transport":13,"component-inherit":8,"debug":9,"engine.io-parser":20,"parseqs":28,"ws":50,"yeast":39}],19:[function(require,module,exports){
 (function (global){
 // browser shim for xmlhttprequest module
 
@@ -6187,27 +6187,39 @@ module.exports = yeast;
 const router = require('./clientRouter.js');
 const avatar = require('./avatar.js');
 const error = require('./error.js');
+const validate = require('./validate.js');
 
 function registerUser()
 {
     var username = document.getElementById('username').value;
     var email = document.getElementById('email').value;
-    axios.post('store/user', {
+    var val = validate.login({
         username: username,
         email: email
-    }).then((response)=> {
-        if(response.data == false)
-        {
-            console.log('show error', response.data);
-            error.trigger('register-error', 'Username is already in use. Please choose another one', 'danger');
-        } else {
-            console.log('go to login');
-            router.goLogin();
-            error.trigger('login-error', 'You have created a new account. Now it\'s time to login', 'success');
-        }
-    }).catch((err)=> {
-        console.log(err);
     });
+
+    if(val == true)
+    {
+        axios.post('store/user', {
+            username: username,
+            email: email
+        }).then((response)=> {
+            if(response.data == false)
+            {
+                console.log('show error', response.data);
+                error.trigger('register-error', 'Username is already in use. Please choose another one', 'danger');
+            } else {
+                console.log('go to login');
+                router.goLogin();
+                error.trigger('login-error', 'You have created a new account. Now it\'s time to login', 'success');
+            }
+        }).catch((err)=> {
+            console.log(err);
+        });
+    } else {
+        error.trigger('register-error', 'Details are incomplete...', 'danger');
+    }
+
 }
 
 function loginUser()
@@ -6215,23 +6227,34 @@ function loginUser()
     console.log('login function');
     var username = document.getElementById('login-username').value;
     var email = document.getElementById('login-email').value;
-    axios.post('/login', {
+
+    var val = validate.login({
         username: username,
         email: email
-    }).then((response)=> {
-        console.log(response.data);
-        if(response.data == true)
-        {
-            avatar.setAvatar(username);
-            avatar.getAvatar();
-            router.goChat();
-            storeInSession(true);
-        } else {
-            error.trigger('Invalid credentials', 'danger');
-        }
-    }).catch((err)=> {
-        console.log(err);
     });
+
+    if(val == true)
+    {
+        axios.post('/login', {
+            username: username,
+            email: email
+        }).then((response)=> {
+            console.log(response.data);
+            if(response.data == true)
+            {
+                avatar.setAvatar(username);
+                avatar.getAvatar();
+                router.goChat();
+                storeInSession(true);
+            } else {
+                error.trigger('login-error', 'Invalid credentials', 'danger');
+            }
+        }).catch((err)=> {
+            console.log(err);
+        });
+    } else {
+        error.trigger('login-error', 'Details are incomplete...', 'danger');
+    }
 }
 
 function storeInSession(login)
@@ -6251,7 +6274,7 @@ module.exports = {
     getFromSession
 }
 
-},{"./avatar.js":41,"./clientRouter.js":43,"./error.js":44}],41:[function(require,module,exports){
+},{"./avatar.js":41,"./clientRouter.js":43,"./error.js":44,"./validate.js":48}],41:[function(require,module,exports){
 function setAvatar(avatar)
 {
     // var avatar = document.getElementById('avatar').value;
@@ -6468,7 +6491,7 @@ module.exports = {
     displayTyping
 }
 
-},{"./../../time.js":48,"./avatar":41,"./events":45,"socket.io-client":30}],47:[function(require,module,exports){
+},{"./../../time.js":49,"./avatar":41,"./events":45,"socket.io-client":30}],47:[function(require,module,exports){
 const socket = require('socket.io-client')();
 const event = require('./events.js');
 const time = require('./../../time.js');
@@ -6539,7 +6562,33 @@ socket.on('newType', function(type) {
     message.displayTyping(type);
 });
 
-},{"./../../time.js":48,"./auth.js":40,"./avatar.js":41,"./background.js":42,"./clientRouter.js":43,"./events.js":45,"./messages":46,"socket.io-client":30}],48:[function(require,module,exports){
+},{"./../../time.js":49,"./auth.js":40,"./avatar.js":41,"./background.js":42,"./clientRouter.js":43,"./events.js":45,"./messages":46,"socket.io-client":30}],48:[function(require,module,exports){
+function login(obj)
+{
+    var email = obj.email;
+    var username = obj.username;
+    var result = true;
+    console.log('input are ', username, email);
+
+    if(username == '')
+    {
+        result = false;
+        console.log('no username');
+    }
+    if(email == '')
+    {
+        result = false;
+        console.log('no email');
+    }
+    console.log('Validate is', result);
+    return result;
+}
+
+module.exports = {
+    login
+}
+
+},{}],49:[function(require,module,exports){
 function get()
 {
     var d = new Date();
@@ -6557,9 +6606,9 @@ module.exports = {
     get
 }
 
-},{}],49:[function(require,module,exports){
-
 },{}],50:[function(require,module,exports){
+
+},{}],51:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
