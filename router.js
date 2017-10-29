@@ -27,11 +27,26 @@ app.get('/get/:name', function(request, response) {
 // Store a new user
 app.post('/store/user', function(request, response) {
     connect.ref('users').once('value', function(result) {
-        var data = result.val();
-        var keys = Object.keys(data);
-        var exist = keys.indexOf(request.body.username);
-        if(exist == -1)
+        if(result.val() !== null)
         {
+            var data = result.val();
+            var keys = Object.keys(data);
+            var exist = keys.indexOf(request.body.username);
+            if(exist == -1)
+            {
+                connect.ref(`users/${request.body.username}`).set({
+                    email: request.body.email
+                }).then((result)=> {
+                    // console.log(result);
+                    response.json(true);
+                }).catch((err)=> {
+                    console.log(err);
+                });
+            } else {
+                console.log('username already exists');
+                response.json(false);
+            }
+        } else {
             connect.ref(`users/${request.body.username}`).set({
                 email: request.body.email
             }).then((result)=> {
@@ -40,9 +55,6 @@ app.post('/store/user', function(request, response) {
             }).catch((err)=> {
                 console.log(err);
             });
-        } else {
-            console.log('username already exists');
-            response.json(false);
         }
     });
 });
